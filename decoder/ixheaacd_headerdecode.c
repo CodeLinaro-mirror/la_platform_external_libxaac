@@ -607,7 +607,7 @@ WORD32 ixheaacd_ga_hdr_dec(ia_aac_dec_state_struct *aac_state_struct,
     err = ixheaacd_config(it_bit_buff,
                           &(pstr_audio_specific_config->str_usac_config),
                           &(pstr_audio_specific_config->channel_configuration));
-    if (err != 0) return -1;
+    if (err != 0) return err;
 
     if (pstr_audio_specific_config->audio_object_type == AOT_USAC) {
       pstr_audio_specific_config->sbr_present_flag = 1;
@@ -922,7 +922,7 @@ WORD32 ixheaacd_latm_header_decode(
         result = ixheaacd_latm_audio_mux_element(
             it_bit_buff, &latm_struct_element, aac_state_struct,
             pstr_samp_rate_info);
-        if (result < 0) {
+        if (result != 0) {
           sync_status = 0;
           aac_state_struct->sync_status = sync_status;
 
@@ -940,8 +940,8 @@ WORD32 ixheaacd_aac_headerdecode(
     WORD32 *bytes_consumed,
     const ia_aac_dec_huffman_tables_struct *pstr_huffmann_tables) {
   struct ia_bit_buf_struct it_bit_buff, *handle_bit_buff;
-  ia_adif_header_struct adif;
-  ia_adts_header_struct adts;
+  ia_adif_header_struct adif = {0};
+  ia_adts_header_struct adts = {0};
   WORD32 result;
   WORD32 header_len;
   WORD32 sync = 0;
@@ -1031,7 +1031,7 @@ WORD32 ixheaacd_aac_headerdecode(
 
         if ((adts.aac_frame_length + ADTS_HEADER_LENGTH) <
             (header_len - bytes_taken)) {
-          ia_adts_header_struct adts_loc;
+          ia_adts_header_struct adts_loc = {0};
 
           handle_bit_buff = ixheaacd_create_init_bit_buf(
               &it_bit_buff, (UWORD8 *)(buffer + adts.aac_frame_length),
