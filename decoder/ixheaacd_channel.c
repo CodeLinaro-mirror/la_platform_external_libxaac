@@ -879,6 +879,12 @@ WORD16 ixheaacd_read_spectral_data(
         ixheaacd_huff_mute_erroneous_lines(pstr_hcr_info);
       }
 
+      if (it_bit_buff->cnt_bits <
+          ptr_aac_dec_channel_info->reorder_spect_data_len) {
+        longjmp(*(it_bit_buff->xaac_jmp_buf),
+                IA_ENHAACPLUS_DEC_EXE_NONFATAL_INSUFFICIENT_INPUT_BYTES);
+      }
+
       it_bit_buff->cnt_bits +=
           -ptr_aac_dec_channel_info->reorder_spect_data_len;
       it_bit_buff->ptr_read_next =
@@ -1147,6 +1153,26 @@ WORD32 ixheaacd_ltp_data(WORD32 object_type, ia_ics_info_struct *ics,
       ltp->long_used[sfb] = ixheaacd_read_bits_buf(bs, 1);
     }
   }
-
+  if (ics->frame_length == 480) {
+    if ((ics->sampling_rate_index > 5) &&
+        (ltp->last_band > MAX_LTP_SFB_SR_FIVE_PLUS_480))
+      ltp->last_band = MAX_LTP_SFB_SR_FIVE_PLUS_480;
+    else if ((ics->sampling_rate_index == 5) &&
+             (ltp->last_band > MAX_LTP_SFB_SR_FIVE_480))
+      ltp->last_band = MAX_LTP_SFB_SR_FIVE_480;
+    else if ((ics->sampling_rate_index < 5) &&
+             (ltp->last_band > MAX_LTP_SFB_SR_FIVE_LESS_480))
+      ltp->last_band = MAX_LTP_SFB_SR_FIVE_LESS_480;
+  } else if (ics->frame_length == 512) {
+    if ((ics->sampling_rate_index > 5) &&
+        (ltp->last_band > MAX_LTP_SFB_SR_FIVE_PLUS_512))
+      ltp->last_band = MAX_LTP_SFB_SR_FIVE_PLUS_512;
+    else if ((ics->sampling_rate_index == 5) &&
+             (ltp->last_band > MAX_LTP_SFB_SR_FIVE_512))
+      ltp->last_band = MAX_LTP_SFB_SR_FIVE_512;
+    else if ((ics->sampling_rate_index < 5) &&
+             (ltp->last_band > MAX_LTP_SFB_SR_FIVE_LESS_512))
+      ltp->last_band = MAX_LTP_SFB_SR_FIVE_LESS_512;
+  }
   return 0;
 }
