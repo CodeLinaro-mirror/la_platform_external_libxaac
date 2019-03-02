@@ -682,7 +682,7 @@ static WORD32 ixheaacd_mps_mapindexdata(
     int out_idx_data[MAX_PARAMETER_SETS_MPS][MAX_PARAMETER_BANDS],
     int cmp_idx_data[MAX_PARAMETER_SETS_MPS][MAX_PARAMETER_BANDS],
     int idx_prev[MAX_PARAMETER_BANDS], int param_type) {
-  int interpolate_local[MAX_PARAMETER_SETS_MPS];
+  int interpolate_local[MAX_PARAMETER_SETS_MPS] = {0};
   int map[MAX_PARAMETER_BANDS + 1];
 
   int set_index, i, band, parm_slot;
@@ -983,7 +983,7 @@ WORD32 ixheaacd_mps_frame_decode(ia_mps_dec_state_struct *self) {
 }
 
 WORD32 ixheaacd_mps_header_decode(ia_mps_dec_state_struct *self) {
-  self->time_slots = self->frame_length + 1;
+  self->time_slots = self->frame_length;
   self->frame_len = self->time_slots * self->qmf_band_count;
   self->bs_param_bands = ixheaacd_freq_res_table[self->config->bs_freq_res];
 
